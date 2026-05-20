@@ -161,18 +161,31 @@
   inherits: false;
 }
 
-@keyframes mockupBorderSpin {
-  to { --mockup-angle: 360deg; }
+@keyframes mockupBorderRotate {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 .mockup-gradient-border {
   border-radius: 16px;
   padding: 3px;
-  background: conic-gradient(
-    from var(--mockup-angle),
-    #29ABE2, #F7941D, #E84C3D, #8DC63F, #20A99D, #29ABE2
-  );
-  animation: mockupBorderSpin 5s linear infinite;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Rotating spinner — GPU-composited, no main-thread repaint */
+.mockup-border-spinner {
+  position: absolute;
+  /* Square based on width so inscribed circle always covers parent corners */
+  width: 200%;
+  aspect-ratio: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(from 0deg, #29ABE2, #F7941D, #E84C3D, #8DC63F, #20A99D, #29ABE2);
+  animation: mockupBorderRotate 5s linear infinite;
+  will-change: transform;
+  pointer-events: none;
 }
 
 /* ── Touch: hover → active (press) feedback ── */

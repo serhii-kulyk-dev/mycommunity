@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef } from "react";
 
 export default function HeroMockup() {
@@ -38,8 +37,8 @@ export default function HeroMockup() {
       const progress = targetScroll <= 0
         ? 1
         : Math.min(1, Math.max(0, window.scrollY / targetScroll));
-      const rotateX = 24 * (1 - progress);
-      const scale   = 0.88 + 0.12 * progress;
+      const rotateX = Math.round(24 * (1 - progress) * 100) / 100;
+      const scale   = Math.round((0.88 + 0.12 * progress) * 1000) / 1000;
       mockupRef.current.style.transform =
         `perspective(1200px) rotateX(${rotateX}deg) scale(${scale})`;
     };
@@ -91,6 +90,7 @@ export default function HeroMockup() {
         transform: "perspective(1200px) rotateX(24deg) scale(0.88)",
         transition: "none",
         isolation: "isolate",
+        willChange: "transform",
       }}
     >
       {/* Blurred glow shadow */}
@@ -122,8 +122,9 @@ export default function HeroMockup() {
         />
       </div>
 
-      {/* Gradient border: conic-gradient як background + padding 3px — без overflow:hidden */}
+      {/* Gradient border: GPU-composited spinner inside overflow:hidden wrapper */}
       <div className="mockup-gradient-border">
+        <div className="mockup-border-spinner" aria-hidden />
         <div
           className="hero-mockup-inner"
           style={{
@@ -133,13 +134,25 @@ export default function HeroMockup() {
             position: "relative",
           }}
         >
-          <Image
-            src="/Канбан.webp"
-            alt="Kanban board preview"
-            fill
-            style={{ objectFit: "cover", objectPosition: "top" }}
-            priority
-          />
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/Канбан.webp"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "top",
+              display: "block",
+            }}
+          >
+            <source src="/preview-hero.webm" type="video/webm" />
+          </video>
         </div>
       </div>
     </div>
