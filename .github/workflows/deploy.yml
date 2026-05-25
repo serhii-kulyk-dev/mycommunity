@@ -1,17 +1,17 @@
-name: Deploy to Production
+name: Deploy to Cityhost via FTP
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  deploy:
-    name: Deploy
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -20,30 +20,20 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
 
       - name: Build
         run: npm run build
+        env:
+          NODE_ENV: production
 
-      - name: Upload to server
-        uses: appleboy/scp-action@v0.1.7
+      - name: Deploy to CityHost via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
-          source: ".next,public,package.json,package-lock.json,next.config.ts,middleware.ts"
-          target: ${{ secrets.DEPLOY_PATH }}
-
-      - name: Restart app
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
-          script: |
-            cd ${{ secrets.DEPLOY_PATH }}
-            npm ci --omit=dev
-            touch tmp/restart.txt
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./out/
+          server-dir: /www/mycommunity-erp.com/
