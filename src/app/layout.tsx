@@ -16,7 +16,7 @@ const inter = Inter({
   display: "swap",
 });
 
-const BASE_URL = "https://mycommunity.com.ua";
+const BASE_URL = "https://mycommunity-erp.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

@@ -7,23 +7,30 @@ import type { ReactNode } from "react";
 
 const PROSE = 820;
 
-/** Placeholder-aware value: strings in [brackets] render as a highlighted chip. */
+const CHIP_STYLE = {
+  background: "#fff4ed",
+  color: "#c2410c",
+  borderRadius: 4,
+  padding: "0 6px",
+  fontWeight: 500,
+} as const;
+
+/** Highlights any [bracketed] segment as a "fill me" chip; plain text passes through. */
 export function V({ children }: { children: string }) {
-  const isPlaceholder = typeof children === "string" && children.trim().startsWith("[");
-  if (!isPlaceholder) return <>{children}</>;
+  if (typeof children !== "string" || !children.includes("[")) return <>{children}</>;
+  const parts = children.split(/(\[[^\]]*\])/g);
   return (
-    <span
-      title="Потребує заповнення перед публікацією"
-      style={{
-        background: "#fff4ed",
-        color: "#c2410c",
-        borderRadius: 4,
-        padding: "0 6px",
-        fontWeight: 500,
-      }}
-    >
-      {children}
-    </span>
+    <>
+      {parts.map((part, i) =>
+        /^\[[^\]]*\]$/.test(part) ? (
+          <span key={i} title="Потребує заповнення перед публікацією" style={CHIP_STYLE}>
+            {part}
+          </span>
+        ) : (
+          part
+        )
+      )}
+    </>
   );
 }
 
