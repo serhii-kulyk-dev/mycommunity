@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "export",
+  // CityHost (Apache) redirects /route → /route/; static export needs
+  // /route/index.html for that to resolve (otherwise 403 on the dir).
+  trailingSlash: true,
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 85, 100],
